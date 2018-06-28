@@ -1,0 +1,57 @@
+Guide: https://neo4j.com/blog/node-js-react-js-developers-neo4j-movies-template/
+
+neo4j 3.3.4
+
+git clone https://github.com/neo4j-examples/neo4j-movies-template.git neo4j-movies
+
+brew cask install java
+
+
+brew tap caskroom/versions
+brew cask install java8
+
+brew install neo4j
+neo4j stop
+export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+
+neo4j start
+
+## Take note of the paths.
+## We specifically need the "home" path
+neo4j-movies> neo4j start
+Active database: graph.db
+Directories in use:
+  home:         /usr/local/Cellar/neo4j/3.3.4/libexec
+  config:       /usr/local/Cellar/neo4j/3.3.4/libexec/conf
+  logs:         /usr/local/Cellar/neo4j/3.3.4/libexec/logs
+  plugins:      /usr/local/Cellar/neo4j/3.3.4/libexec/plugins
+  import:       /usr/local/Cellar/neo4j/3.3.4/libexec/import
+  data:         /usr/local/Cellar/neo4j/3.3.4/libexec/data
+  certificates: /usr/local/Cellar/neo4j/3.3.4/libexec/certificates
+  run:          /usr/local/Cellar/neo4j/3.3.4/libexec/run
+
+
+## allow localhost connections to your neo4j database:
+https://neo4j.com/developer/kb/explanation-of-error-websocket-connection-failure/
+
+uncomment in conf/neo4j.conf ->
+dbms.connectors.default_listen_address=0.0.0.0
+dbms.connector.bolt.address=0.0.0.0:7687
+dbms.connector.http.listen_address=0.0.0.0:7474
+dbms.connector.https.listen_address=0.0.0.0:7473
+
+
+rm -rf /usr/local/Cellar/neo4j/3.3.4/libexec/data/databases/graph.db
+export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+export NEO4J_HOME="/usr/local/Cellar/neo4j/3.3.4/libexec"
+$NEO4J_HOME/bin/neo4j-import --into $NEO4J_HOME/data/databases/graph.db --nodes:Person csv/person_node.csv --nodes:Movie csv/movie_node.csv --relationships:ACTED_IN csv/acted_in_rels.csv --delimiter ";" --array-delimiter "|" --id-type INTEGER
+
+export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+neo4j restart
+
+export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+export NEO4J_HOME="/usr/local/Cellar/neo4j/3.3.4/libexec"
+$NEO4J_HOME/bin/neo4j-shell < setup.cql -path $NEO4J_HOME/databases/graph.db
+
+export MOVIE_DATABASE_USERNAME=neo4j
+export MOVIE_DATABASE_PASSWORD=eggs
