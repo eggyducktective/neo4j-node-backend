@@ -68,6 +68,8 @@ api.get('/movies/acted_in_by/:id', routes.movies.findMoviesByActor);
 api.get('/people', routes.people.list);
 api.get('/people/:id', routes.people.findById);
 api.get('/people/bacon', routes.people.getBaconPeople);
+api.get('/people/name/:name', routes.people.findByName);
+api.get('/people/search/:name', routes.people.search);
 
 //api error handler
 api.use(function(err, req, res, next) {

@@ -83,6 +83,67 @@ var getAll = function (session) {
     .then(result => _manyPeople(result));
 };
 
+
+// get a single person by name
+var getByName = function (session, name1) {
+  var query = [
+    // 'MATCH (person:Person {name:{name1}})',
+    `MATCH (person:Person) WHERE person.name =~ "(?i)${ name1 }"`,
+    'OPTIONAL MATCH (person)-[:DIRECTED]->(d:Movie)',
+    'OPTIONAL MATCH (person)<-[:PRODUCED]->(p:Movie)',
+    'OPTIONAL MATCH (person)<-[:WRITER_OF]->(w:Movie)',
+    'OPTIONAL MATCH (person)<-[r:ACTED_IN]->(a:Movie)',
+    'OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTED_IN]-(relatedPerson)',
+    'RETURN DISTINCT person,',
+    'collect(DISTINCT { name:d.title, id:d.id, poster_image:d.poster_image}) AS directed,',
+    'collect(DISTINCT { name:p.title, id:p.id, poster_image:p.poster_image}) AS produced,',
+    'collect(DISTINCT { name:w.title, id:w.id, poster_image:w.poster_image}) AS wrote,',
+    'collect(DISTINCT{ name:a.title, id:a.id, poster_image:a.poster_image, role:r.role}) AS actedIn,',
+    'collect(DISTINCT{ name:relatedPerson.name, id:relatedPerson.id, poster_image:relatedPerson.poster_image, role:relatedRole.role}) AS related'
+  ].join('\n');
+
+  return session
+    .run(query, {name1: name1})
+    .then(result => {
+      if (!_.isEmpty(result.records)) {
+        return _singlePersonWithDetails(result.records[0]);
+      }
+      else {
+        throw {message: 'person not found', status: 404}
+      }
+    });
+};
+
+// get a single person by name
+var search = function (session, name1) {
+  var query = [
+    `MATCH (person:Person) WHERE person.name =~ "(?i).*${ name1 }.*"`,
+    'OPTIONAL MATCH (person)-[:DIRECTED]->(d:Movie)',
+    'OPTIONAL MATCH (person)<-[:PRODUCED]->(p:Movie)',
+    'OPTIONAL MATCH (person)<-[:WRITER_OF]->(w:Movie)',
+    'OPTIONAL MATCH (person)<-[r:ACTED_IN]->(a:Movie)',
+    'OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTED_IN]-(relatedPerson)',
+    'RETURN DISTINCT person'
+    // 'RETURN DISTINCT person,',
+    // 'collect(DISTINCT { name:d.title, id:d.id, poster_image:d.poster_image}) AS directed,',
+    // 'collect(DISTINCT { name:p.title, id:p.id, poster_image:p.poster_image}) AS produced,',
+    // 'collect(DISTINCT { name:w.title, id:w.id, poster_image:w.poster_image}) AS wrote,',
+    // 'collect(DISTINCT{ name:a.title, id:a.id, poster_image:a.poster_image, role:r.role}) AS actedIn,',
+    // 'collect(DISTINCT{ name:relatedPerson.name, id:relatedPerson.id, poster_image:relatedPerson.poster_image, role:relatedRole.role}) AS related'
+  ].join('\n');
+
+  return session
+    .run(query, {name1: name1})
+    .then(result => {
+      if (!_.isEmpty(result.records)) {
+        return _manyPeople(result);
+      }
+      else {
+        throw {message: 'person not found', status: 404}
+      }
+    });
+};
+
 // get people in Bacon path, return many persons
 var getBaconPeople = function (session, name1, name2) {
 //needs to be optimized
@@ -101,6 +162,8 @@ var getBaconPeople = function (session, name1, name2) {
 };
 
 module.exports = {
+  search: search,
+  getByName: getByName,
   getAll: getAll,
   getById: getById,
   getBaconPeople: getBaconPeople

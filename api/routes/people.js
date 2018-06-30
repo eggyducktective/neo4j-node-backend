@@ -115,3 +115,48 @@ exports.findById = function (req, res, next) {
     .then(response => writeResponse(res, response))
     .catch(next);
 };
+
+
+/**
+ * @swagger
+ * /api/v0/people/name/{name}:
+ *   get:
+ *     tags:
+ *     - people
+ *     description: Returns a person by name
+ *     summary: Returns a person by name
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: name
+ *         description: Person name
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: A person
+ *         schema:
+ *           $ref: '#/definitions/Person'
+ *       400:
+ *         description: Error message(s)
+ *       404:
+ *         description: Person not found
+ */
+exports.findByName = function (req, res, next) {
+  var name = req.params.name;
+  if (!name) throw {message: 'Invalid name', status: 400};
+
+  People.getByName(dbUtils.getSession(req), name)
+    .then(response => writeResponse(res, response))
+    .catch(next);
+};
+
+exports.search = function (req, res, next) {
+  var name = req.params.name;
+  if (!name) throw {message: 'Invalid name', status: 400};
+
+  People.search(dbUtils.getSession(req), name)
+    .then(response => writeResponse(res, response))
+    .catch(next);
+};
