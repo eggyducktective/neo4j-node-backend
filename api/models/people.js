@@ -62,13 +62,13 @@ var getById = function (session, id, output) {
 };
 
 // get all people
-var getAll = function (session) {
+var getAll = function (session, output) {
   return session.run('MATCH (person:Person) RETURN person')
     .then(result => {
       if ( output == "d3" ) {
         return graphOutput(result);
       } else {
-        _manyPeople(result)}
+        return _manyPeople(result)}
       });
 };
 
@@ -94,7 +94,9 @@ var getByName = function (session, name1, output) {
   return session
     .run(query, {name1: name1})
     .then(result => {
-      if (!_.isEmpty(result.records)) {
+      if ( output == "d3" ) {
+        return graphOutput(result.records);
+      } else if (!_.isEmpty(result.records)) {
         return _singlePersonWithDetails(result.records[0]);
       }
       else {
@@ -118,7 +120,9 @@ var search = function (session, name1, output) {
   return session
     .run(query, {name1: name1})
     .then(result => {
-      if (!_.isEmpty(result.records)) {
+      if ( output == "d3" ) {
+        return graphOutput(result.records);
+      } else if (!_.isEmpty(result.records)) {
         return _manyPeople(result);
       }
       else {
@@ -141,7 +145,16 @@ var getBaconPeople = function (session, name1, name2, output) {
   return session.run(query, {
     name1: name1,
     name2: name2
-  }).then(result => _manyPeople(result))
+  }).then(result => {
+    if ( output == "d3" ) {
+      return graphOutput(result.records);
+    } else if (!_.isEmpty(result.records)) {
+      return _manyPeople(result);
+    }
+    else {
+      throw {message: 'person not found', status: 404}
+    }
+  });
 };
 
 
@@ -154,7 +167,16 @@ var getByMovie = function (session, id, output) {
 
   return session.run(query, {
     id: id
-  }).then(result => _manyPeople(result))
+  }).then(result => {
+    if ( output == "d3" ) {
+      return graphOutput(result.records);
+    } else if (!_.isEmpty(result.records)) {
+      return _manyPeople(result);
+    }
+    else {
+      throw {message: 'person not found', status: 404}
+    }
+  });
 };
 
 

@@ -29,12 +29,6 @@ var People = require('../models/people')
  *     summary: Returns all people
  *     produces:
  *       - application/json
- *     parameters:
- *       - name: output
- *         description: Output type - "default" or "d3"
- *         in: query
- *         required: false
- *         type: string
  *     responses:
  *       200:
  *         description: A list of people
@@ -235,11 +229,6 @@ exports.search = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: integer
- *       - name: output
- *         description: Output type - "default" or "d3"
- *         in: query
- *         required: false
- *         type: string
  *     responses:
  *       200:
  *         description: A list of actors

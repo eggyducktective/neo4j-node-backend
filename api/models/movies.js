@@ -37,7 +37,13 @@ function manyMovies(neo4jResult) {
 var getAll = function (session, output) {
   return session
     .run('MATCH (movie:Movie) RETURN movie')
-    .then(r => manyMovies(r));
+    .then(result => {
+    if ( output == "d3" ) {
+      return graphOutput(result);
+    } else  {
+      return manyMovies(result);
+    }
+  });
 };
 
 // get a single movie by id
@@ -67,7 +73,9 @@ var getById = function (session, movieId, output) {
   return session.run(query, {
     movieId: movieId
     }).then(result => {
-    if (!_.isEmpty(result.records)) {
+    if ( output == "d3" ) {
+      return graphOutput(result.records);
+    } else if (!_.isEmpty(result.records)) {
       return _singleMovieWithDetails(result.records[0]);
     }
     else {
@@ -103,7 +111,9 @@ var getByName = function (session, name1, output) {
   return session.run(query, {
     name1: name1
     }).then(result => {
-    if (!_.isEmpty(result.records)) {
+    if ( output == "d3" ) {
+      return graphOutput(result.records);
+    } else if (!_.isEmpty(result.records)) {
       return _singleMovieWithDetails(result.records[0]);
     }
     else {
@@ -121,38 +131,44 @@ var getByActor = function (session, id, output) {
 
   return session.run(query, {
     id: id
-  }).then(result => manyMovies(result))
+  }).then(result => {
+    if ( output == "d3" ) {
+      return graphOutput(result);
+    } else  {
+      return manyMovies(result);
+    }
+  });
 };
 
-// var getGraph = function () {
-//   var session = driver.session();
-//   return session.run(
-//     'MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) \
-//     RETURN m.title AS movie, collect(a.name) AS cast \
-//     LIMIT {limit}', {limit: 100})
-//     .then(results => {
-//       session.close();
-//       var nodes = [], rels = [], i = 0;
-//       results.records.forEach(res => {
-//         nodes.push({title: res.get('movie'), label: 'movie'});
-//         var target = i;
-//         i++;
-//
-//         res.get('cast').forEach(name => {
-//           var actor = {title: name, label: 'actor'};
-//           var source = _.findIndex(nodes, actor);
-//           if (source == -1) {
-//             nodes.push(actor);
-//             source = i;
-//             i++;
-//           }
-//           rels.push({source, target})
-//         })
-//       });
-//
-//       return {nodes, links: rels};
-//     });
-// }
+var graphOutput = function(data) {
+  // return data;
+  // return results;
+  var nodes = [], rels = [], i = 0;
+  data.forEach(res => {
+    var movie_id = res.get('movie').properties.id;
+    var movie_node = res.get('movie').properties;
+    movie_node['label'] = "movie";
+    if ( "version" in movie_node ) {
+      delete movie_node.version;
+    }
+    if ( "runtime" in movie_node ) {
+      delete movie_node.runtime;
+    }
+    nodes.push(movie_node);
+    var target = movie_id;
+
+    res.get('actors').forEach(name => {
+      var person_id = name.id;
+      var person_node = name
+      // person_node['label'] = "person";
+      var source = person_id;
+      nodes.push(name);
+      rels.push({source, target})
+    })
+  });
+
+  return {nodes, links: rels};
+}
 
 // export exposed functions
 module.exports = {

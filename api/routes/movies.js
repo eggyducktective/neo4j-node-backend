@@ -42,12 +42,6 @@ var Movies = require('../models/movies')
  *     summary: Find all movies
  *     produces:
  *       - application/json
- *     parameters:
- *       - name: output
- *         description: Output type - "default" or "d3"
- *         in: query
- *         required: false
- *         type: string
  *     responses:
  *       200:
  *         description: A list of movies
@@ -115,11 +109,6 @@ exports.findById = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: integer
- *       - name: output
- *         description: Output type - "default" or "d3"
- *         in: query
- *         required: false
- *         type: string
  *     responses:
  *       200:
  *         description: A list of movies
