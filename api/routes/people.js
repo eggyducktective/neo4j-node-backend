@@ -152,11 +152,73 @@ exports.findByName = function (req, res, next) {
     .catch(next);
 };
 
+/**
+ * @swagger
+ * /api/v0/people/search/{name}:
+ *   get:
+ *     tags:
+ *     - people
+ *     description: Returns an array of people based on keyword
+ *     summary: Returns an array of people based on keyword
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: name
+ *         description: Part of a name
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: An array of persons
+ *         schema:
+ *           $ref: '#/definitions/Person'
+ *       400:
+ *         description: Error message(s)
+ *       404:
+ *         description: Person not found
+ */
 exports.search = function (req, res, next) {
   var name = req.params.name;
   if (!name) throw {message: 'Invalid name', status: 400};
 
   People.search(dbUtils.getSession(req), name)
+    .then(response => writeResponse(res, response))
+    .catch(next);
+};
+
+
+/**
+ * @swagger
+ * /api/v0/people/acting_in_by/{id}:
+ *   get:
+ *     tags:
+ *     - people
+ *     description: Returns people acting in the same movie
+ *     summary: Returns people acting in the same movie
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: id of the movie
+ *         in: path
+ *         required: true
+ *         type: integer
+ *     responses:
+ *       200:
+ *         description: A list of actors
+ *         schema:
+ *           type: array
+ *           items:
+ *             $ref: '#/definitions/People'
+ *       400:
+ *         description: Error message(s)
+ */
+exports.findActorsByMovie = function (req, res, next) {
+  var id = req.params.id;
+  if (!id) throw {message: 'Invalid id', status: 400};
+
+  People.getByMovie(dbUtils.getSession(req), id)
     .then(response => writeResponse(res, response))
     .catch(next);
 };

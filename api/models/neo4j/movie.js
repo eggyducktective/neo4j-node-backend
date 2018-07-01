@@ -6,10 +6,10 @@ var Movie = module.exports = function (_node, myRating) {
   _.extend(this, _node.properties);
 
   if (this.id) {
-    this.id = this.id.toNumber();
+    this.id = this.id;
   }
-  if (this.duration) { 
-    this.duration = this.duration.toNumber();
+  if (this.runtime) {
+    this.runtime = this.runtime.toNumber();
   }
 
   if(myRating || myRating === 0) {

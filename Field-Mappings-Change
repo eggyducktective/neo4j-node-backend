@@ -1,0 +1,19 @@
+data field mappings:
+
+OLD/NEW
+
+Movie:
+summary: string         ->  description: string
+duration: integer       ->  runtime: integer
+rated: string           ->  N/A -> remove this
+tagline: string         ->  tagline: string
+id: integer             ->  id:string (done already)
+title: string           ->  title: string
+poster_image: string    ->  imageUrl: string
+
+Person:
+name: string            ->  name: string
+id: integer             ->  id: string (done)
+born: integer           ->  birthday: string
+poster_image: string    ->  profileImageUrl: string
+

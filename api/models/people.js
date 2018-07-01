@@ -6,33 +6,15 @@ var _singlePersonWithDetails = function (record) {
     var result = {};
     _.extend(result, new Person(record.get('person')));
     // mappings are temporary until the neo4j driver team decides what to do about numbers
-    result.directed = _.map(record.get('directed'), record => {
-      if (record.id) {
-        record.id = record.id.toNumber();
-      }
-      return record;
-    });
-    result.produced = _.map(record.get('produced'), record => {
-      if (record.id) {
-        record.id = record.id.toNumber();
-      }
-      return record;
-    });
-    result.wrote = _.map(record.get('wrote'), record => {
-      if (record.id) {
-        record.id = record.id.toNumber();
-      }
-      return record;
-    });
     result.actedIn = _.map(record.get('actedIn'), record => {
       if (record.id) {
-        record.id = record.id.toNumber();
+        record.id = record.id;
       }
       return record;
     });
     result.related = _.map(record.get('related'), record => {
       if (record.id) {
-        record.id = record.id.toNumber();
+        record.id = record.id;
       }
       return record;
     });
@@ -55,8 +37,8 @@ var getById = function (session, id) {
     'OPTIONAL MATCH (person)-[:DIRECTED]->(d:Movie)',
     'OPTIONAL MATCH (person)<-[:PRODUCED]->(p:Movie)',
     'OPTIONAL MATCH (person)<-[:WRITER_OF]->(w:Movie)',
-    'OPTIONAL MATCH (person)<-[r:ACTED_IN]->(a:Movie)',
-    'OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTED_IN]-(relatedPerson)',
+    'OPTIONAL MATCH (person)<-[r:ACTS_IN]->(a:Movie)',
+    'OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTS_IN]-(relatedPerson)',
     'RETURN DISTINCT person,',
     'collect(DISTINCT { name:d.title, id:d.id, poster_image:d.poster_image}) AS directed,',
     'collect(DISTINCT { name:p.title, id:p.id, poster_image:p.poster_image}) AS produced,',
@@ -66,7 +48,7 @@ var getById = function (session, id) {
   ].join('\n');
 
   return session
-    .run(query, {id: parseInt(id)})
+    .run(query, {id: id})
     .then(result => {
       if (!_.isEmpty(result.records)) {
         return _singlePersonWithDetails(result.records[0]);
@@ -92,8 +74,8 @@ var getByName = function (session, name1) {
     'OPTIONAL MATCH (person)-[:DIRECTED]->(d:Movie)',
     'OPTIONAL MATCH (person)<-[:PRODUCED]->(p:Movie)',
     'OPTIONAL MATCH (person)<-[:WRITER_OF]->(w:Movie)',
-    'OPTIONAL MATCH (person)<-[r:ACTED_IN]->(a:Movie)',
-    'OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTED_IN]-(relatedPerson)',
+    'OPTIONAL MATCH (person)<-[r:ACTS_IN]->(a:Movie)',
+    'OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTS_IN]-(relatedPerson)',
     'RETURN DISTINCT person,',
     'collect(DISTINCT { name:d.title, id:d.id, poster_image:d.poster_image}) AS directed,',
     'collect(DISTINCT { name:p.title, id:p.id, poster_image:p.poster_image}) AS produced,',
@@ -121,8 +103,8 @@ var search = function (session, name1) {
     'OPTIONAL MATCH (person)-[:DIRECTED]->(d:Movie)',
     'OPTIONAL MATCH (person)<-[:PRODUCED]->(p:Movie)',
     'OPTIONAL MATCH (person)<-[:WRITER_OF]->(w:Movie)',
-    'OPTIONAL MATCH (person)<-[r:ACTED_IN]->(a:Movie)',
-    'OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTED_IN]-(relatedPerson)',
+    'OPTIONAL MATCH (person)<-[r:ACTS_IN]->(a:Movie)',
+    'OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTS_IN]-(relatedPerson)',
     'RETURN DISTINCT person'
     // 'RETURN DISTINCT person,',
     // 'collect(DISTINCT { name:d.title, id:d.id, poster_image:d.poster_image}) AS directed,',
@@ -148,7 +130,7 @@ var search = function (session, name1) {
 var getBaconPeople = function (session, name1, name2) {
 //needs to be optimized
   var query = [
-    'MATCH p = shortestPath( (p1:Person {name:{name1} })-[:ACTED_IN*]-(target:Person {name:{name2} }) )',
+    'MATCH p = shortestPath( (p1:Person {name:{name1} })-[:ACTS_IN*]-(target:Person {name:{name2} }) )',
     'WITH extract(n in nodes(p)|n) AS coll',
     'WITH filter(thing in coll where length(thing.name)> 0) AS bacon',
     'UNWIND(bacon) AS person',
@@ -161,8 +143,22 @@ var getBaconPeople = function (session, name1, name2) {
   }).then(result => _manyPeople(result))
 };
 
+
+// Get by movie
+var getByMovie = function (session, id) {
+  var query = [
+    'MATCH (person:Person)-[:ACTS_IN]->(movie:Movie {id:{id}})',
+    'RETURN DISTINCT person'
+  ].join('\n');
+
+  return session.run(query, {
+    id: id
+  }).then(result => _manyPeople(result))
+};
+
 module.exports = {
   search: search,
+  getByMovie: getByMovie,
   getByName: getByName,
   getAll: getAll,
   getById: getById,

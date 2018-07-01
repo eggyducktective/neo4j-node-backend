@@ -120,3 +120,38 @@ exports.findMoviesByActor = function (req, res, next) {
     .then(response => writeResponse(res, response))
     .catch(next);
 };
+
+/**
+ * @swagger
+ * /api/v0/movies/name/{name}:
+ *   get:
+ *     tags:
+ *     - movies
+ *     description: Returns a movie by name
+ *     summary: Returns a movie by name
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: name
+ *         description: Movie name
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: A movie
+ *         schema:
+ *           $ref: '#/definitions/movie'
+ *       400:
+ *         description: Error message(s)
+ *       404:
+ *         description: Person not found
+ */
+exports.findByName = function (req, res, next) {
+  var name = req.params.name;
+  if (!name) throw {message: 'Invalid name', status: 400};
+
+  Movies.getByName(dbUtils.getSession(req), name)
+    .then(response => writeResponse(res, response))
+    .catch(next);
+};
