@@ -29,6 +29,12 @@ var People = require('../models/people')
  *     summary: Returns all people
  *     produces:
  *       - application/json
+ *     parameters:
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A list of people
@@ -38,7 +44,8 @@ var People = require('../models/people')
  *             $ref: '#/definitions/Person'
  */
 exports.list = function (req, res, next) {
-  People.getAll(dbUtils.getSession(req))
+  var output = req.query.output || 'default';
+  People.getAll(dbUtils.getSession(req), output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
@@ -64,6 +71,11 @@ exports.list = function (req, res, next) {
  *         in: query
  *         required: true
  *         type: string
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A list of people
@@ -75,8 +87,9 @@ exports.list = function (req, res, next) {
 exports.getBaconPeople = function (req, res, next) {
   var name1 = req.query.name1;
   var name2 = req.query.name2;
+  var output = req.query.output || 'default';
 
-  People.getBaconPeople(dbUtils.getSession(req), req.query.name1, req.query.name2)
+  People.getBaconPeople(dbUtils.getSession(req), req.query.name1, req.query.name2, output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
@@ -97,6 +110,11 @@ exports.getBaconPeople = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: integer
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A person
@@ -109,9 +127,10 @@ exports.getBaconPeople = function (req, res, next) {
  */
 exports.findById = function (req, res, next) {
   var id = req.params.id;
+  var output = req.query.output || 'default';
   if (!id) throw {message: 'Invalid id', status: 400};
 
-  People.getById(dbUtils.getSession(req), id)
+  People.getById(dbUtils.getSession(req), id, output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
@@ -133,6 +152,11 @@ exports.findById = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: string
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A person
@@ -145,9 +169,10 @@ exports.findById = function (req, res, next) {
  */
 exports.findByName = function (req, res, next) {
   var name = req.params.name;
+  var output = req.query.output || 'default';
   if (!name) throw {message: 'Invalid name', status: 400};
 
-  People.getByName(dbUtils.getSession(req), name)
+  People.getByName(dbUtils.getSession(req), name, output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
@@ -168,6 +193,11 @@ exports.findByName = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: string
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: An array of persons
@@ -180,9 +210,10 @@ exports.findByName = function (req, res, next) {
  */
 exports.search = function (req, res, next) {
   var name = req.params.name;
+  var output = req.query.output || 'default';
   if (!name) throw {message: 'Invalid name', status: 400};
 
-  People.search(dbUtils.getSession(req), name)
+  People.search(dbUtils.getSession(req), name, output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
@@ -204,6 +235,11 @@ exports.search = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: integer
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A list of actors
@@ -216,9 +252,10 @@ exports.search = function (req, res, next) {
  */
 exports.findActorsByMovie = function (req, res, next) {
   var id = req.params.id;
+  var output = req.query.output || 'default';
   if (!id) throw {message: 'Invalid id', status: 400};
 
-  People.getByMovie(dbUtils.getSession(req), id)
+  People.getByMovie(dbUtils.getSession(req), id, output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };

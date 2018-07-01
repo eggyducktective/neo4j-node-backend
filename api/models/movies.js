@@ -34,14 +34,14 @@ function manyMovies(neo4jResult) {
 }
 
 // get all movies
-var getAll = function (session) {
+var getAll = function (session, output) {
   return session
     .run('MATCH (movie:Movie) RETURN movie')
     .then(r => manyMovies(r));
 };
 
 // get a single movie by id
-var getById = function (session, movieId) {
+var getById = function (session, movieId, output) {
   var query = [
     'MATCH (movie:Movie {id: {movieId}})',
     'OPTIONAL MATCH (movie)<-[r:ACTS_IN]-(a:Person)',
@@ -59,7 +59,7 @@ var getById = function (session, movieId) {
     'collect(DISTINCT d) AS directors,',
     'collect(DISTINCT p) AS producers,',
     'collect(DISTINCT w) AS writers,',
-    'collect(DISTINCT{ name:a.name, id:a.id, profileImageUrl:a.profileImageUrl, role:r.role}) AS actors,',
+    'collect(DISTINCT{ name:a.name, id:a.id, profileImageUrl:a.profileImageUrl, role:r.name}) AS actors,',
     'collect(DISTINCT related) AS related,',
     'collect(DISTINCT genre) AS genres',
   ].join('\n');
@@ -77,7 +77,7 @@ var getById = function (session, movieId) {
 };
 
 // get a single movie by id
-var getByName = function (session, name1) {
+var getByName = function (session, name1, output) {
   var query = [
     `MATCH (movie:Movie) WHERE movie.title =~ "(?i).*${ name1 }.*"`,
     'OPTIONAL MATCH (movie)<-[r:ACTS_IN]-(a:Person)',
@@ -95,7 +95,7 @@ var getByName = function (session, name1) {
     'collect(DISTINCT d) AS directors,',
     'collect(DISTINCT p) AS producers,',
     'collect(DISTINCT w) AS writers,',
-    'collect(DISTINCT{ name:a.name, id:a.id, profileImageUrl:a.profileImageUrl, role:r.role}) AS actors,',
+    'collect(DISTINCT{ name:a.name, id:a.id, profileImageUrl:a.profileImageUrl, role:r.name}) AS actors,',
     'collect(DISTINCT related) AS related,',
     'collect(DISTINCT genre) AS genres',
   ].join('\n');
@@ -113,9 +113,9 @@ var getByName = function (session, name1) {
 };
 
 // Get by date range
-var getByActor = function (session, id) {
+var getByActor = function (session, id, output) {
   var query = [
-    'MATCH (actor:Person {id:{id}})-[:ACTS_IN]->(movie:Movie)',
+    'MATCH (person:Person {id:{id}})-[:ACTS_IN]->(movie:Movie)',
     'RETURN DISTINCT movie'
   ].join('\n');
 
@@ -123,6 +123,36 @@ var getByActor = function (session, id) {
     id: id
   }).then(result => manyMovies(result))
 };
+
+// var getGraph = function () {
+//   var session = driver.session();
+//   return session.run(
+//     'MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) \
+//     RETURN m.title AS movie, collect(a.name) AS cast \
+//     LIMIT {limit}', {limit: 100})
+//     .then(results => {
+//       session.close();
+//       var nodes = [], rels = [], i = 0;
+//       results.records.forEach(res => {
+//         nodes.push({title: res.get('movie'), label: 'movie'});
+//         var target = i;
+//         i++;
+//
+//         res.get('cast').forEach(name => {
+//           var actor = {title: name, label: 'actor'};
+//           var source = _.findIndex(nodes, actor);
+//           if (source == -1) {
+//             nodes.push(actor);
+//             source = i;
+//             i++;
+//           }
+//           rels.push({source, target})
+//         })
+//       });
+//
+//       return {nodes, links: rels};
+//     });
+// }
 
 // export exposed functions
 module.exports = {

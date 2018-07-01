@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+</style>
+<svg width="960" height="600"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+//create somewhere to put the force directed graph
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+var my_data = {"nodes":[{"birthday":"-307501200000","birthplace":"Ibadan, Nigeria","name":"Hugo Weaving","lastModified":"1299490766000","id":"1331","biography":"is a British-Australian film and stage actor. He is best known for his roles as Agent Smith in the Matrix trilogy, Elrond in the Lord of the Rings trilogy, Megatron in the Transformers series and V  in V for Vendetta.","profileImageUrl":"http://cf1.imgobject.com/profiles/021/4bc9f9bf017a3c0e91000021/hugo-weaving-profile.jpg","label":"person"},{"name":"The Interview","id":"19846","imageUrl":"http://cf1.imgobject.com/posters/5af/4bc957b5017a3c57fe0275af/the-interview-mid.jpg","role":"Eddie Rodney Fleming","label":"movie"},{"name":"Proof","id":"14904","imageUrl":"http://cf1.imgobject.com/posters/435/4c8935347b9aa1545b000435/proof-mid.jpg","role":"Martin","label":"movie"},{"name":"The Matrix Revisited","id":"14543","imageUrl":"http://cf1.imgobject.com/posters/e4a/4bc9437e017a3c57fe01ce4a/the-matrix-revisited-mid.jpg","role":"Himself / Agent Smith","label":"movie"},{"name":"Peaches","id":"13789","imageUrl":"http://cf1.imgobject.com/posters/bea/4bc93f5e017a3c57fe01abea/peaches-mid.jpg","role":"Alan","label":"movie"},{"name":"Little Fish","id":"9993","imageUrl":"http://cf1.imgobject.com/posters/5c6/4bc92b05017a3c57fe0115c6/little-fish-mid.jpg","role":"Lionel","label":"movie"},{"name":"Happy Feet","id":"9836","imageUrl":"http://cf1.imgobject.com/posters/3cf/4cb7d90f5e73d677850003cf/happy-feet-mid.jpg","role":"Noah the Elder","label":"movie"},{"name":"Babe","id":"9598","imageUrl":"http://cf1.imgobject.com/posters/30d/4cb1d2287b9aa1263d00030d/babe-mid.jpg","role":"Rex the Male Sheepdog (voice)","label":"movie"},{"name":"The Wolfman","id":"7978","imageUrl":"http://cf1.imgobject.com/posters/e4c/4cf890075e73d6299e001e4c/the-wolfman-mid.jpg","role":"Inspector Francis Abberline","label":"movie"},{"name":"The Adventures of Priscilla, Queen of the Desert","id":"2759","imageUrl":"http://cf1.imgobject.com/posters/f8c/4bc9179f017a3c57fe008f8c/the-adventures-of-priscilla-queen-of-the-desert-mid.jpg","role":"Anthony  Belrose/Mitzi Del Bra","label":"movie"},{"name":"Transformers","id":"1858","imageUrl":"http://cf1.imgobject.com/posters/233/4c9ea5cf5e73d67049000233/transformers-mid.jpg","role":"Megatron (voice)","label":"movie"},{"name":"Captain America: The First Avenger","id":"1771","imageUrl":"http://cf1.imgobject.com/posters/1d2/4d5c2f797b9aa1122f0011d2/captain-america-the-first-avenger-mid.jpg","role":"Johann Schmidt / The Red Skull","label":"movie"},{"name":"V for Vendetta","id":"752","imageUrl":"http://cf1.imgobject.com/posters/2cd/4bc90bed017a3c57fe0042cd/v-for-vendetta-mid.jpg","role":"William Rookwood","label":"movie"},{"name":"The Lord of the Rings: The Return of the King","id":"122","imageUrl":"http://cf1.imgobject.com/posters/8f0/4cc4b4405e73d677850018f0/the-lord-of-the-rings-the-return-of-the-king-mid.jpg","role":"Elrond","label":"movie"},{"name":"The Lord of the Rings: The Two Towers","id":"121","imageUrl":"http://cf1.imgobject.com/posters/8e2/4cc4a5ee5e73d677850018e2/the-lord-of-the-rings-the-two-towers-mid.jpg","role":"Elrond","label":"movie"},{"name":"The Lord of the Rings: The Fellowship of the Ring","id":"120","imageUrl":"http://cf1.imgobject.com/posters/8b8/4cc48d685e73d677850018b8/the-lord-of-the-rings-the-fellowship-of-the-ring-mid.jpg","role":"Elrond","label":"movie"},{"name":"The Matrix Revolutions","id":"605","imageUrl":"http://cf1.imgobject.com/posters/6aa/4bc909ee017a3c57fe0036aa/the-matrix-revolutions-mid.jpg","role":"Agent Smith","label":"movie"},{"name":"The Matrix Reloaded","id":"604","imageUrl":"http://cf1.imgobject.com/posters/679/4bc909e6017a3c57fe003679/the-matrix-reloaded-mid.jpg","role":"Agent Smith","label":"movie"},{"name":"The Matrix","id":"603","imageUrl":"http://cf1.imgobject.com/posters/606/4bc909d0017a3c57fe003606/the-matrix-mid.jpg","role":"Agent Smith","label":"movie"}],"links":[{"source":"19846","target":"1331"},{"source":"14904","target":"1331"},{"source":"14543","target":"1331"},{"source":"13789","target":"1331"},{"source":"9993","target":"1331"},{"source":"9836","target":"1331"},{"source":"9598","target":"1331"},{"source":"7978","target":"1331"},{"source":"2759","target":"1331"},{"source":"1858","target":"1331"},{"source":"1771","target":"1331"},{"source":"752","target":"1331"},{"source":"122","target":"1331"},{"source":"121","target":"1331"},{"source":"120","target":"1331"},{"source":"605","target":"1331"},{"source":"604","target":"1331"},{"source":"603","target":"1331"}]};
+
+var nodes_data=my_data['nodes']
+// var nodes_data =  [
+//     {"name": "Travis", "sex": "M"},
+//     {"name": "Rake", "sex": "M"},
+//     {"name": "Diana", "sex": "F"},
+//     {"name": "Rachel", "sex": "F"},
+//     {"name": "Shawn", "sex": "M"},
+//     {"name": "Emerald", "sex": "F"}
+//     ]
+
+
+
+//set up the simulation
+//nodes only for now
+var simulation = d3.forceSimulation()
+					//add nodes
+					.nodes(nodes_data);
+
+//add forces
+//we're going to add a charge to each node
+//also going to add a centering force
+simulation
+    .force("charge_force", d3.forceManyBody())
+    .force("center_force", d3.forceCenter(width / 2, height / 2));
+
+
+//draw circles for the nodes
+var node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(nodes_data)
+        .enter()
+        .append("circle")
+        .attr("r", 5)
+        .attr("fill", "red");
+
+
+
+//add tick instructions:
+simulation.on("tick", tickActions );
+
+
+//Time for the links
+
+//Create links data
+var links_data = my_data['links'];
+// var links_data = [
+// 	{"source": "Travis", "target": "Rake"},
+//     {"source": "Diana", "target": "Rake"},
+//     {"source": "Diana", "target": "Rachel"},
+//     {"source": "Rachel", "target": "Rake"},
+//     {"source": "Rachel", "target": "Shawn"},
+//     {"source": "Emerald", "target": "Rachel"}
+// ]
+
+
+
+//Create the link force
+//We need the id accessor to use named sources and targets
+
+var link_force =  d3.forceLink(links_data)
+                        .id(function(d) { return d.id; })
+
+//Add a links force to the simulation
+//Specify links  in d3.forceLink argument
+
+
+simulation.force("links",link_force)
+
+//draw lines for the links
+var link = svg.append("g")
+      .attr("class", "links")
+    .selectAll("line")
+    .data(links_data)
+    .enter().append("line")
+      .attr("stroke-width", 2);
+
+
+function tickActions() {
+    //update circle positions each tick of the simulation
+    node
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+
+    //update link positions
+    //simply tells one end of the line to follow one node around
+    //and the other end of the line to follow the other node around
+    link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+  }
+
+
+</script>

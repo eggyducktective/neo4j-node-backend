@@ -42,6 +42,12 @@ var Movies = require('../models/movies')
  *     summary: Find all movies
  *     produces:
  *       - application/json
+ *     parameters:
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A list of movies
@@ -51,7 +57,8 @@ var Movies = require('../models/movies')
  *             $ref: '#/definitions/Movie'
  */
 exports.list = function (req, res, next) {
-  Movies.getAll(dbUtils.getSession(req))
+  var output = req.query.output || 'default';
+  Movies.getAll(dbUtils.getSession(req), output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
@@ -72,6 +79,11 @@ exports.list = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: integer
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A movie
@@ -81,7 +93,8 @@ exports.list = function (req, res, next) {
  *         description: movie not found
  */
 exports.findById = function (req, res, next) {
-  Movies.getById(dbUtils.getSession(req), req.params.id)
+  var output = req.query.output || 'default';
+  Movies.getById(dbUtils.getSession(req), req.params.id, output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
@@ -102,6 +115,11 @@ exports.findById = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: integer
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A list of movies
@@ -114,9 +132,10 @@ exports.findById = function (req, res, next) {
  */
 exports.findMoviesByActor = function (req, res, next) {
   var id = req.params.id;
+  var output = req.query.output || 'default';
   if (!id) throw {message: 'Invalid id', status: 400};
 
-  Movies.getByActor(dbUtils.getSession(req), id)
+  Movies.getByActor(dbUtils.getSession(req), id, output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
@@ -137,6 +156,11 @@ exports.findMoviesByActor = function (req, res, next) {
  *         in: path
  *         required: true
  *         type: string
+ *       - name: output
+ *         description: Output type - "default" or "d3"
+ *         in: query
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: A movie
@@ -149,9 +173,10 @@ exports.findMoviesByActor = function (req, res, next) {
  */
 exports.findByName = function (req, res, next) {
   var name = req.params.name;
+  var output = req.query.output || 'default';
   if (!name) throw {message: 'Invalid name', status: 400};
 
-  Movies.getByName(dbUtils.getSession(req), name)
+  Movies.getByName(dbUtils.getSession(req), name, output)
     .then(response => writeResponse(res, response))
     .catch(next);
 };
