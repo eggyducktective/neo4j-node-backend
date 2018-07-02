@@ -20,7 +20,8 @@ nconf.env(['PORT', 'NODE_ENV'])
       alias: "neo4j",
       describe: "Use local or remote neo4j instance",
       demand: false,
-      default: "local"
+      // default: "local"
+      default: "remote"
     }
   })
   .defaults({
@@ -28,9 +29,10 @@ nconf.env(['PORT', 'NODE_ENV'])
     // 'PASSWORD' : process.env.MOVIE_DATABASE_PASSWORD,
     'USERNAME': 'neo4j',
     'PASSWORD' : 'eggs',
-    'neo4j': 'local',
+    // 'neo4j': 'local',
+    'neo4j': 'remote',
     'neo4j-local': 'bolt://localhost:7687',
-    'neo4j-remote': 'bolt:http://162.243.100.222:7687',
+    'neo4j-remote': 'bolt://178.128.211.174:7687',
     'base_url': 'http://localhost:3000',
     'api_path': '/api/v0'
   });

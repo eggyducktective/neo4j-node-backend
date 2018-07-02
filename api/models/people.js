@@ -196,9 +196,12 @@ var graphOutput = function(data) {
     res.get('actedIn').forEach(name => {
       var movie_id = name.id;
       var movie_node = name
+      if ( "role" in movie_node ){
+        delete movie_node.role;
+      }
       movie_node['label'] = "movie";
       var source = movie_id;
-      nodes.push(name);
+      nodes.push(movie_node);
       rels.push({source, target})
     })
   });
