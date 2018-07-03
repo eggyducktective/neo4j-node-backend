@@ -179,14 +179,24 @@ var getByMovie = function (session, id, output) {
   });
 };
 
+var randomColor = function () {
+  var c1 = String(Math.floor(Math.random() * 255));
+  var c2 = String(Math.floor(Math.random() * 255));
+  var c3 = String(Math.floor(Math.random() * 255));
+  var color = `rgb(${c1}, ${c2}, ${c3})`;
+  return color;
+}
 
 var graphOutput = function(data) {
   // return results;
+  var myColor = randomColor();
   var nodes = [], rels = [], i = 0;
   data.forEach(res => {
     var person_id = res.get('person').properties.id;
     var person_node = res.get('person').properties;
     person_node['label'] = "person";
+    person_node['symbolType'] = "star";
+    person_node['color'] = myColor;
     if ( "version" in person_node ) {
       delete person_node.version;
     }
@@ -200,6 +210,9 @@ var graphOutput = function(data) {
         delete movie_node.role;
       }
       movie_node['label'] = "movie";
+      movie_node['symbolType'] = "circle";
+      movie_node['color'] = myColor;
+
       var source = movie_id;
       nodes.push(movie_node);
       rels.push({source, target})

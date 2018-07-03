@@ -140,14 +140,26 @@ var getByActor = function (session, id, output) {
   });
 };
 
+var randomColor = function () {
+  var c1 = String(Math.floor(Math.random() * 255));
+  var c2 = String(Math.floor(Math.random() * 255));
+  var c3 = String(Math.floor(Math.random() * 255));
+  var color = `rgb(${c1}, ${c2}, ${c3})`;
+  return color;
+}
+
 var graphOutput = function(data) {
   // return data;
   // return results;
+  var myColor = randomColor();
   var nodes = [], rels = [], i = 0;
   data.forEach(res => {
     var movie_id = res.get('movie').properties.id;
     var movie_node = res.get('movie').properties;
     movie_node['label'] = "movie";
+    movie_node['symbolType'] = "circle";
+    movie_node['color'] = myColor;
+
     if ( "version" in movie_node ) {
       delete movie_node.version;
     }
@@ -160,9 +172,11 @@ var graphOutput = function(data) {
     res.get('actors').forEach(name => {
       var person_id = name.id;
       var person_node = name
-      // person_node['label'] = "person";
+      person_node['symbolType'] = "star";
+      person_node['color'] = myColor;
+      person_node['label'] = "person";
       var source = person_id;
-      nodes.push(name);
+      nodes.push(person_node);
       rels.push({source, target})
     })
   });
