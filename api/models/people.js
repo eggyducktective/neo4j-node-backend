@@ -82,19 +82,6 @@ var match = function (session, name1, output) {
     .run(query, {name1: name1})
     .then(result => {
       return {match: !_.isEmpty(result.records)};
-      // if( !_.isEmpty(result.records) ){
-      //   throw {message: 'found', status: 200}
-      // } else {
-      //   throw {message: 'not found', status: 404}
-      // }
-      // if ( output == "d3" ) {
-      //   return graphOutput(result.records);
-      // } else if (!_.isEmpty(result.records)) {
-      //   return _singlePersonWithDetails(result.records[0]);
-      // }
-      // else {
-      //   throw {message: 'person not found', status: 404}
-      // }
     });
 
 };
@@ -218,9 +205,17 @@ var randomSize = function (min, max) {
   return String(Math.floor(Math.random() * (max - min + 1) + min))
 }
 
+var randomTextColor = function(){
+  var c1 = String(Math.floor(Math.random() * 100));
+  var c2 = String(Math.floor(Math.random() * 100));
+  var c3 = String(Math.floor(Math.random() * 100));
+  var color = `rgb(${c1}, ${c2}, ${c3})`;
+  return color;
+}
+
 var graphOutput = function(data) {
   // return results;
-  // var myColor = randomColor();
+
   var nodes = [], rels = [], i = 0;
   // var size = randomSize(200,500);
   data.forEach(res => {
@@ -229,7 +224,9 @@ var graphOutput = function(data) {
     person_node['label'] = "person";
     person_node['symbolType'] = "star";
     person_node['color'] = randomColor();
-    person_node['size'] =  randomSize(200,500);
+    person_node['size'] =  randomSize(200,2000);
+    person_node['fontSize'] = randomSize(15, 30);
+    person_node['fontColor'] = randomTextColor();
     if ( "version" in person_node ) {
       delete person_node.version;
     }
@@ -245,7 +242,9 @@ var graphOutput = function(data) {
       movie_node['label'] = "movie";
       movie_node['symbolType'] = "circle";
       movie_node['color'] = randomColor(); //myColor;
-      movie_node['size'] = randomSize(200,500); //size;
+      movie_node['size'] = randomSize(200,2000); //node size;
+      movie_node['fontSize'] = randomSize(15, 30);
+      movie_node['fontColor'] = randomTextColor();
 
       var source = movie_id;
       nodes.push(movie_node);

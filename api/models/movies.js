@@ -152,19 +152,29 @@ var randomSize = function (min, max) {
   return String(Math.floor(Math.random() * (max - min + 1) + min))
 }
 
+var randomTextColor = function(){
+  var c1 = String(Math.floor(Math.random() * 100));
+  var c2 = String(Math.floor(Math.random() * 100));
+  var c3 = String(Math.floor(Math.random() * 100));
+  var color = `rgb(${c1}, ${c2}, ${c3})`;
+  return color;
+}
+
 var graphOutput = function(data) {
   // return data;
   // return results;
-  var myColor = randomColor();
+
   var nodes = [], rels = [], i = 0;
-  var size = randomSize(200,500);
+  // var size = randomSize(200,500);
   data.forEach(res => {
     var movie_id = res.get('movie').properties.id;
     var movie_node = res.get('movie').properties;
     movie_node['label'] = "movie";
     movie_node['symbolType'] = "circle";
-    movie_node['color'] = myColor;
-    movie_node['size'] = size;
+    movie_node['color'] = randomColor();
+    movie_node['size'] = randomSize(200,2000);
+    movie_node['fontSize'] = randomSize(15, 30);
+    movie_node['fontColor'] = randomTextColor();
 
     if ( "version" in movie_node ) {
       delete movie_node.version;
@@ -179,9 +189,11 @@ var graphOutput = function(data) {
       var person_id = name.id;
       var person_node = name
       person_node['symbolType'] = "star";
-      person_node['color'] = myColor;
+      person_node['color'] = randomColor(); //myColor;
       person_node['label'] = "person";
-      person_node['size'] = size;
+      person_node['size'] = randomSize(200,2000); //node size;
+      person_node['fontSize'] = randomSize(15, 30); // fontSize
+      movie_node['fontColor'] = randomTextColor();
       var source = person_id;
       nodes.push(person_node);
       rels.push({source, target})
