@@ -148,17 +148,23 @@ var randomColor = function () {
   return color;
 }
 
+var randomSize = function (min, max) {
+  return String(Math.floor(Math.random() * (max - min + 1) + min))
+}
+
 var graphOutput = function(data) {
   // return data;
   // return results;
   var myColor = randomColor();
   var nodes = [], rels = [], i = 0;
+  var size = randomSize(200,500);
   data.forEach(res => {
     var movie_id = res.get('movie').properties.id;
     var movie_node = res.get('movie').properties;
     movie_node['label'] = "movie";
     movie_node['symbolType'] = "circle";
     movie_node['color'] = myColor;
+    movie_node['size'] = size;
 
     if ( "version" in movie_node ) {
       delete movie_node.version;
@@ -175,6 +181,7 @@ var graphOutput = function(data) {
       person_node['symbolType'] = "star";
       person_node['color'] = myColor;
       person_node['label'] = "person";
+      person_node['size'] = size;
       var source = person_id;
       nodes.push(person_node);
       rels.push({source, target})

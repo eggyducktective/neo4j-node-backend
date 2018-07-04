@@ -212,6 +212,17 @@ exports.search = function (req, res, next) {
     .catch(next);
 };
 
+exports.match = function (req, res, next) {
+  var name = req.params.name;
+  var output = req.query.output || 'default';
+  if (!name) throw {message: 'Invalid name', status: 400};
+
+  People.match(dbUtils.getSession(req), name, output)
+    .then(response => writeResponse(res, response))
+    .catch(next);
+};
+
+
 
 /**
  * @swagger

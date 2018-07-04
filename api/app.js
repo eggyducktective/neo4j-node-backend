@@ -72,6 +72,7 @@ api.get('/people/acting_in_by/:id', routes.people.findActorsByMovie);
 api.get('/people/bacon', routes.people.getBaconPeople);
 api.get('/people/name/:name', routes.people.findByName);
 api.get('/people/search/:name', routes.people.search);
+api.get('/people/match/:name',routes.people.match);
 
 //api error handler
 api.use(function(err, req, res, next) {

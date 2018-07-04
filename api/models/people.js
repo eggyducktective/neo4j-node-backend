@@ -72,6 +72,33 @@ var getAll = function (session, output) {
       });
 };
 
+// check if the name given returns an exact match
+var match = function (session, name1, output) {
+  var query = [
+    `MATCH (person:Person) WHERE person.name =~ "(?i)${ name1 }"`,
+    "RETURN DISTINCT person"
+  ].join('\n');
+  return session
+    .run(query, {name1: name1})
+    .then(result => {
+      return {match: !_.isEmpty(result.records)};
+      // if( !_.isEmpty(result.records) ){
+      //   throw {message: 'found', status: 200}
+      // } else {
+      //   throw {message: 'not found', status: 404}
+      // }
+      // if ( output == "d3" ) {
+      //   return graphOutput(result.records);
+      // } else if (!_.isEmpty(result.records)) {
+      //   return _singlePersonWithDetails(result.records[0]);
+      // }
+      // else {
+      //   throw {message: 'person not found', status: 404}
+      // }
+    });
+
+};
+
 
 // get a single person by name
 var getByName = function (session, name1, output) {
@@ -187,16 +214,22 @@ var randomColor = function () {
   return color;
 }
 
+var randomSize = function (min, max) {
+  return String(Math.floor(Math.random() * (max - min + 1) + min))
+}
+
 var graphOutput = function(data) {
   // return results;
-  var myColor = randomColor();
+  // var myColor = randomColor();
   var nodes = [], rels = [], i = 0;
+  // var size = randomSize(200,500);
   data.forEach(res => {
     var person_id = res.get('person').properties.id;
     var person_node = res.get('person').properties;
     person_node['label'] = "person";
     person_node['symbolType'] = "star";
-    person_node['color'] = myColor;
+    person_node['color'] = randomColor();
+    person_node['size'] =  randomSize(200,500);
     if ( "version" in person_node ) {
       delete person_node.version;
     }
@@ -211,7 +244,8 @@ var graphOutput = function(data) {
       }
       movie_node['label'] = "movie";
       movie_node['symbolType'] = "circle";
-      movie_node['color'] = myColor;
+      movie_node['color'] = randomColor(); //myColor;
+      movie_node['size'] = randomSize(200,500); //size;
 
       var source = movie_id;
       nodes.push(movie_node);
@@ -223,6 +257,7 @@ var graphOutput = function(data) {
 }
 
 module.exports = {
+  match: match,
   search: search,
   getByMovie: getByMovie,
   getByName: getByName,
