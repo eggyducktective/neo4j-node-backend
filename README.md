@@ -1,10 +1,8 @@
 # README
 
-This Neo4j-based node / react web app displays movie and person data in a manner similar to IMDB. The backend for my final project for my Web Development Bootcamp at General Assembly.
+This Neo4j-based node / react web app displays movie and person data in a manner similar to IMDB. The backend for my final project for my Web Development Bootcamp at General Assembly. You can see my final project here: [Search the Stars Github](https://github.com/eggyducktective/moviestar-react-frontend)
 
 I followed a tutorial on Github to set this up. I also added a few customised routes and updated my models to reflect an alternate dataset (see below). Here are the instructions that come with the original Github project.
-
-You can see my final project here [a link](https://github.com/eggyducktective/moviestar-react-frontend)
 
 ## The Model
 
