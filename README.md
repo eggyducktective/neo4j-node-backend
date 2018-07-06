@@ -50,7 +50,7 @@ From the root directory of this project:
 
 There is a swagger doc for each API call available at:
 
-* Take a look at the docs at [http://localhost:3000/docs](http://localhost:3000/docs)
+* Take a look at the docs at [Click here!](http://localhost:3000/docs)
 (Currently seems to be unavailable when hosted on Heroku etc.)
 
 ## Contributing
