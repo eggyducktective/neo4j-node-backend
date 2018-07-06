@@ -10,7 +10,7 @@ I followed a tutorial on Github to set this up. I also added a few customised ro
 
 ### Data
 
-I used the neo4j movies dataset [a link](https://neo4j.com/developer/movie-database/).
+I used the neo4j movies dataset [Click here!](https://neo4j.com/developer/movie-database/).
 Updated it with images from TheMovieDatabase.
 
 ### Relationships
